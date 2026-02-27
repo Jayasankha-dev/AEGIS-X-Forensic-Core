@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS-X | Forensic Intelligence Core</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-red: #ff0055;
+            --dark-bg: #010204;
+            --glass: rgba(10, 15, 25, 0.85);
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* --- Background Effects --- */
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        .scanline {
+            width: 100%; height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0, 242, 255, 0) 0%, rgba(0, 242, 255, 0.1) 50%, rgba(0, 242, 255, 0) 100%);
+            opacity: 0.1;
+            position: fixed;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100%; }
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.05) 0%, transparent 70%);
+        }
+
+        .logo-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .logo-box img {
+            width: 160px;
+            border-radius: 30px;
+            filter: drop-shadow(0 0 20px var(--neon-blue));
+            border: 2px solid var(--neon-blue);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px var(--neon-blue)); }
+            100% { transform: scale(1.05); filter: drop-shadow(0 0 30px var(--neon-blue)); }
+        }
+
+        h1 {
+            font-size: 5rem;
+            margin: 10px;
+            letter-spacing: 15px;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, var(--neon-blue), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -500px; }
+            100% { background-position: 500px; }
+        }
+
+        /* Typewriter Console */
+        .console {
+            font-family: 'Courier New', monospace;
+            color: var(--neon-blue);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border-left: 3px solid var(--neon-blue);
+            min-width: 300px;
+            margin-bottom: 40px;
+        }
+
+        /* --- Buttons --- */
+        .download-container {
+            display: flex; gap: 20px;
+        }
+
+        .btn-modern {
+            padding: 15px 40px;
+            text-decoration: none;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            font-weight: bold;
+            letter-spacing: 2px;
+            position: relative;
+            transition: 0.5s;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .btn-modern::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: var(--neon-blue);
+            transition: 0.5s; z-index: -1;
+        }
+
+        .btn-modern:hover::before { left: 0; }
+        .btn-modern:hover { color: #000; box-shadow: 0 0 40px var(--neon-blue); }
+
+        /* --- Feature Cards --- */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .cyber-card {
+            background: var(--glass);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 40px;
+            border-radius: 2px;
+            transition: 0.4s;
+            position: relative;
+        }
+
+        .cyber-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-10px);
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        .cyber-card i {
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 50px;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: #444;
+            border-top: 1px solid #111;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scanline"></div>
+    <canvas id="canvas-bg"></canvas>
+
+    <section class="hero">
+        <div class="logo-box">
+            <img src="logo.png" alt="AEGIS-X">
+        </div>
+        <h1>AEGIS-X</h1>
+        <div class="console">> <span id="typed-text"></span><span class="cursor">_</span></div>
+        
+        <div class="download-container">
+            <a href="https://github.com/Jayasankha-dev/AEGIS-X-Forensic-Core/releases/download/cyber-sec-tool/AEGIS-X.exe" class="btn-modern">
+                INITIALIZE DOWNLOAD
+            </a>
+            <a href="https://github.com/Jayasankha-dev/AEGIS-X-Forensic-Core" class="btn-modern" style="border-color: #fff; color: #fff;">
+                GITHUB_SOURCE
+            </a>
+        </div>
+    </section>
+
+    <div class="content">
+        <div class="cyber-card">
+            <i class="fas fa-microchip"></i>
+            <h3>Kernel Auditing</h3>
+            <p>Live analysis of system calls and process threads to identify unmapped memory execution.</p>
+        </div>
+        <div class="cyber-card">
+            <i class="fas fa-network-wired"></i>
+            <h3>Traffic Triage</h3>
+            <p>Real-time packet destination tracking with ASN-level intelligence and Geo-locking data.</p>
+        </div>
+        <div class="cyber-card">
+            <i class="fas fa-user-ninja"></i>
+            <h3>Persistence Hunter</h3>
+            <p>Advanced detection of WMI event consumers and non-standard registry autostart hives.</p>
+        </div>
+    </div>
+
+    <footer>
+        [ SYSTEM ARCHITECTURE: X64 ] | [ SECURITY LEVEL: CLASSIFIED ] <br>
+        DESIGNED BY JAYASANKHA-DEV
+    </footer>
+
+    <script>
+        // Typewriter Effect
+        const text = "Initializing Forensic Core... Signature Validated... Scanning for Threats...";
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                document.getElementById("typed-text").innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, 50);
+            } else {
+                setTimeout(() => { document.getElementById("typed-text").innerHTML = ""; i = 0; type(); }, 3000);
+            }
+        }
+        type();
+
+        // Canvas Particle Background
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < 100; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        init();
+        animate();
+    </script>
+</body>
+</html>
