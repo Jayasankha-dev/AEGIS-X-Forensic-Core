@@ -1,0 +1,11 @@
+Project_Folder/
+│
+├── main.py
+├── scanner.py
+├── network.py
+├── forensics.py
+├── utils.py
+├── run_guard.bat
+└── database/
+    ├── GeoLite2-City.mmdb
+    └── GeoLite2-ASN.mmdb

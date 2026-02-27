@@ -1,0 +1,51 @@
+🛡️ Browser Security Audit Guide: Hunting Hidden Background Connections
+
+This guide explains how to identify and terminate unauthorized background services (Service Workers) that may be leaking data or tracking your activity 
+without your consent.
+
+1. The Entry Point: Notifications
+URL: chrome://settings/content/notifications
+
+Purpose: Malicious sites often trick users into clicking "Allow" on a notification pop-up. This is the "hook" they use to install a Service Worker.
+
+What to do: Look at the "Allowed to send notifications" list. If you see sites you don't recognize (especially shopping, betting, or random string sites), 
+remove them immediately.
+
+2. The Engine: Service Worker Internals
+URL: chrome://serviceworker-internals/
+
+Purpose: This page lists every background script currently registered in your browser. Service Workers can run even if the website's tab is closed.
+
+What to check: * Scope: Look for URLs that don't belong to trusted services like Google, YouTube, or your installed extensions.
+
+Registration Count: A typical user has 5-15. If you see 50+, your browser is likely being used for data harvesting or ad-fraud.
+
+The Fix: Use the "Unregister" button for suspicious entries, or use the Console script to wipe them all at once.
+
+3. The Evidence: Network Export
+URL: chrome://net-export/
+
+Purpose: This is a forensic tool that captures every single packet of data entering or leaving the browser.
+
+How to use: 1. Click "Start Logging to Disk".
+2. Browse for a few minutes.
+3. Stop logging and upload the .json file to a tool like NetLog Viewer.
+
+What we look for: We search for "Established" connections to foreign IP addresses (like the Alibaba/Taobao IPs we found) 
+that occur while you aren't even visiting those sites.
+
+🚀 Quick Cleanup Command (For Developers)
+To instantly terminate all registered background workers, open the Console (F12) on any standard website and run:
+
+JavaScript
+navigator.serviceWorker.getRegistrations().then(registrations => {
+    for(let registration of registrations) {
+        registration.unregister();
+        console.log('Terminated:', registration.scope);
+    }
+    console.log('Audit Complete: All background services cleared.');
+});
+
+💡 Summary for the User
+If your computer feels slow or you see suspicious network activity in PowerShell, it is often not a "virus" in the traditional sense, 
+but a Service Worker Hijack. By auditing these three Chrome internal pages, you can regain 100% control over your data privacy.
