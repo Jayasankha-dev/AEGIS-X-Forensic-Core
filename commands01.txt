@@ -1,0 +1,74 @@
+🛡️ Advanced Forensic Toolkit (Set #02)
+11. Hidden SMB Share Audit
+Command: Get-SmbShare
+
+Description: Checks for shared folders on your network.
+
+Objective: Attackers often create "Hidden Shares" (like C$) to move files between machines on the same Wi-Fi.
+
+12. Digital Signature Verification (System File Hijacking)
+Command: Get-ChildItem -Path C:\Windows\System32\*.exe | Get-AuthenticodeSignature | Where-Object { $_.Status -ne "Valid" }
+
+Description: Scans core Windows files to see if their digital signature is broken.
+
+Objective: Detects if a hacker has replaced a real Windows file (like taskmgr.exe) with a fake, malicious one.
+
+13. WMI Event Consumer Hunt (The "Ghost" Persistence)
+Command: Get-WmiObject -Namespace root\subscription -Class __EventConsumer
+
+Description: Scans for WMI scripts that run without a process.
+
+Objective: This is the most "high-level" way hackers hide. The malware runs inside Windows Management Instrumentation, making it invisible to the Task Manager.
+
+14. DLL Injection & Loaded Module Audit
+Command: Get-Process | ForEach-Object { $_.Modules } | Where-Object { $_.FileName -like "*AppData*" -or $_.FileName -like "*Temp*" }
+
+Description: Lists every DLL file currently loaded into your RAM from suspicious folders.
+
+Objective: Detects "DLL Injection," where a virus hides inside a legitimate program like Chrome or Notepad.
+
+15. Clipboard & Keylogger Buffer Check
+Command: Get-Clipboard (or monitoring RawInput via API)
+
+Description: Checks what is currently sitting in the system clipboard.
+
+Objective: Some malware monitors the clipboard to steal passwords when you copy-paste them from a manager.
+
+16. Power-Shell Execution Policy Audit
+Command: Get-ExecutionPolicy -List
+
+Description: Shows if the security restrictions for scripts have been lowered.
+
+Objective: If LocalMachine is set to Unrestricted, it means a hacker has disabled your script security.
+
+17. ARP Table Inspection (Man-in-the-Middle check)
+Command: arp -a
+
+Description: Shows the physical addresses (MAC) of devices you are talking to.
+
+Objective: Detects if someone on your Wi-Fi is intercepting your traffic (ARP Spoofing).
+
+18. Hidden User Group Membership
+Command: Get-WmiObject Win32_GroupUser | Where-Object { $_.GroupComponent -match "Administrators" }
+
+Description: A deeper look at group memberships that might not show up in the standard UI.
+
+Objective: To ensure the "Anonymous" account or other hidden SIDs aren't nested inside other groups.
+
+19. Large File & Sparse File Discovery
+Command: Get-ChildItem -Path C:\ -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Length -gt 500MB }
+
+Description: Finds unusually large files created recently.
+
+Objective: Locates "Data Staging" areas where a hacker has zipped up your photos/docs before uploading them.
+
+20. Firewall Rule Audit (Unauthorized Holes)
+Command: Get-NetFirewallRule | Where-Object { $_.Enabled -eq "True" -and $_.Direction -eq "Inbound" } | Select-Object DisplayName, Profile, Action
+
+Description: Lists every rule that allows outside traffic into your PC.
+
+Objective: To see if a program has "punched a hole" in your firewall to allow remote control.
+
+🚨 Final Pro-Tip for your Report:
+If you find a suspicious file (like a .ps1 or .exe), you can get its Hash to check it against global databases like VirusTotal:
+Get-FileHash -Path "C:\Path\To\SuspiciousFile.exe" -Algorithm SHA256
