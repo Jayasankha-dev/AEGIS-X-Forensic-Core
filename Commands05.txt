@@ -1,0 +1,70 @@
+🛡️ Deep System Artifacts & Anti-Forensics (Set #05)
+41. Windows Defender Exclusion Audit
+Command: Get-MpPreference | Select-Object -Property ExclusionPath, ExclusionExtension, ExclusionProcess
+
+Description: Lists all folders, file types, or processes that Windows Defender is forbidden to scan.
+
+Objective: Hackers often add their own folders (like C:\Windows\Temp\loot) to this list so the antivirus ignores their malware.
+
+42. PowerShell "Transcription" Log Check
+Command: Get-ItemProperty "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription"
+
+Description: Checks if "Deep Script Block Logging" or "Transcription" is enabled.
+
+Objective: If this was enabled by the attacker, they might be logging your admin passwords. If enabled by you, it’s a goldmine of evidence.
+
+43. AppLocker & Software Restriction Audit
+Command: Get-AppLockerPolicy -Effective
+
+Description: Shows which programs are allowed or blocked from running.
+
+Objective: To see if the attacker has "whitelisted" their own tools while blocking your security software.
+
+44. WMI "Filter" Persistence Hunt
+Command: Get-WmiObject -Namespace root\subscription -Class __EventFilter
+
+Description: Scans for WMI filters that wait for a specific condition (like "at 3:00 AM" or "when a USB is plugged in").
+
+Objective: This is the trigger mechanism for the most advanced "ghost" malware.
+
+45. Recycle Bin Forensic Recovery
+Command: Get-ChildItem -Path 'C:\$Recycle.Bin' -Recurse -Force
+
+Description: Investigates the contents of the system-protected Recycle Bin.
+
+Objective: Attackers often delete their tools after use. The actual file data remains here under names like $R... or $I... until emptied.
+
+46. Remote Service Installation Logs (ID 7045)
+Command: Get-WinEvent -FilterHashtable @{LogName='System'; ID=7045} -ErrorAction SilentlyContinue
+
+Description: Finds logs of any new service that was installed on the machine.
+
+Objective: Shows the exact name and path of any "Backdoor Service" the attacker tried to register.
+
+47. User Initialization Script Audit
+Command: Get-ItemProperty "HKCU:\Environment" | Select-Object UserInitMprScript
+
+Description: Checks for a rare persistence key called UserInitMprScript.
+
+Objective: If this key exists, it runs a script before the desktop even loads. Most antivirus tools forget to check this.
+
+48. Time-Stomping Detection (MACE Evidence)
+Command: Get-ChildItem -Path C:\Windows\System32 -File | Sort-Object LastWriteTime -Descending | Select-Object Name, LastWriteTime, CreationTime -First 20
+
+Description: Compares "Creation Time" vs "Last Write Time."
+
+Objective: If a file was "Written" before it was "Created," it's proof of Time-Stomping (a hacker trick to make a new virus look like an old system file).
+
+49. Hidden Global Assembly Cache (GAC) Audit
+Command: ls C:\Windows\Microsoft.NET\assembly\GAC_MSIL
+
+Description: Lists .NET assemblies registered in the system.
+
+Objective: Detects "Malicious DLLs" that are registered globally, allowing them to be loaded by almost any application on the PC.
+
+50. Boot Configuration Data (BCD) Tamper Check
+Command: bcdedit /enum all
+
+Description: Shows the boot configuration (how Windows starts).
+
+Objective: To see if the attacker has enabled testsigning or debug mode, which allows the system to run unverified, malicious drivers.
