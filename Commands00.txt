@@ -74,6 +74,10 @@ Objective: Trace the attacker’s footprint even if browser history has been cle
 10. Event Log Forensics (The Smoking Gun)
 Command: Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4688} -MaxEvents 50
 
+2: Get-WinEvent -LogName 'Security' -MaxEvents 5 | Select-Object TimeCreated, ID, Message
+
+3: Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4624} -MaxEvents 20 | Select-Object TimeCreated, Message
+
 Description: Extracts security logs for "Process Creation" events.
 
 Objective: Provides an irrefutable log of exactly which commands were executed during the attack.
