@@ -1,0 +1,72 @@
+🛡️ The "Centennial" Audit & Recovery (Set #06: Steps 51-60)
+51. Master File Table (MFT) & USN Journal Analysis
+Command: fsutil usn readjournal C: csv
+Description: Reads the low-level "Journal" of every single file change ever made on the disk.
+Objective: Even if a hacker deletes a file and clears the Event Logs, the USN Journal (built into the NTFS file system) keeps a record of the deletion. This is the ultimate "History" of the hard drive.
+
+52. Nuclear Process Termination (Suspension First)
+Command: Get-Process | Where-Object { $_.CPU -gt 50 } | ForEach-Object { $_.Suspend() }
+Description: Instead of killing a process (which might trigger a "Watchdog" to restart it), this Freezes the process in RAM.
+Objective: Stops the virus from acting without letting it know it's being attacked. You can then analyze its memory while it's "frozen."
+
+53. Removing "Image File Execution Options" (The Silent Hijack)
+Command: Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"
+Description: Checks if a hacker has redirected common apps.
+Objective: Hackers use this so that when you try to open taskmgr.exe or regedit.exe, it actually opens their virus instead. Delete any key here that matches a system app.
+
+54. Total Network Stack Purge (The 2100 Standard)
+Command: ```powershell
+netsh branchcache reset; netsh int ipv6 reset; netsh advfirewall reset; nbtstat -R; nbtstat -RR
+
+**Description:** Resets every communication protocol in the OS.
+**Objective:** Clears hidden "Static Routes" and "DNS Poisoning" that hackers use to redirect your traffic even after a reboot.
+
+### 55. WMI Repository Repair (Removing the "Ghost in the Machine")
+**Command:** `winmgmt /salvagerepository`
+**Description:** Verifies and repairs the WMI database.
+**Objective:** If a hacker has hidden "Permanent Event Consumers" (Ghost malware) in WMI, this command rebuilds the database to its clean state.
+
+### 56. Deep Registry "Run" Cleanup (The Kill-Switch)
+**Command:** ```powershell
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "*" -ErrorAction SilentlyContinue
+Description: Wipes EVERY startup item.
+Objective: It’s better to manually re-enable what you need (Chrome, Spotify) than to let one hidden malware Run key survive.
+
+57. The "Immutability" Lock (Protecting System32)
+Command: ```powershell
+icacls "C:\Windows\System32" /setowner "NT SERVICE\TrustedInstaller"; icacls "C:\Windows\System32" /grant:r "Everyone":(RX)
+
+**Description:** Resets permissions of System32 to "Read & Execute" only.
+**Objective:** Prevents any user (even an Admin or a Hacker) from writing new malicious files into the most sensitive part of Windows.
+
+### 58. Dispatching the "Shadow Admin" (Full Deletion)
+**Command:** ```powershell
+net user Anonymous /delete; Remove-LocalGroupMember -Group "Administrators" -Member "Anonymous"
+Description: Forcefully deletes the user account and strips its privileges.
+Objective: Complete removal of the attacker's "Home Base" in your system.
+
+59. Clearing the "Prefetch & Temp" Biohazard Zones
+Command: ```powershell
+Remove-Item -Path "C:\Windows\Temp*", "C:\Windows\Prefetch*", "$env:LOCALAPPDATA\Temp*" -Recurse -Force
+
+**Description:** Wipes the three main places where malware hides its temporary "Payloads."
+**Objective:** Removes the physical tracks of the virus.
+
+### 60. Final Integrity Seal (DISM Health Restore)
+**Command:** `DISM /Online /Cleanup-Image /RestoreHealth`
+**Description:** Connects to Microsoft's servers to download "Perfect" copies of any corrupted system files.
+**Objective:** This is the ultimate "Fix Everything" button. It replaces any file the hacker touched with a 100% original version.
+
+
+
+---
+
+## 🛠️ The 2100 Maintenance Plan (For the User)
+
+To keep this machine running perfectly until the next century, follow this **Post-Audit Protocol**:
+
+1.  **Run Step 60** once every 6 months.
+2.  **Run Step 54** whenever the internet feels "laggy."
+3.  **Check Step 07** (from Set 1) weekly to ensure no new users appeared.
+
+---
