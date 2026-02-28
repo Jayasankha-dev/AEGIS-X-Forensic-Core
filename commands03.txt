@@ -1,0 +1,75 @@
+Gemini said
+As a Senior Incident Responder, your final layer of defense involves Active Hunting. This set focuses on "Artifact Recovery"—finding the traces left behind in hidden system caches, registry hives, and memory buffers.
+
+Here is Advanced Audit Set #3, ready for your README.md.
+
+🛡️ Forensic Artifact Recovery & Deep Hunt (Set #03)
+21. User Assist & Program Execution History
+Command: Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count"
+
+Description: Decodes the UserAssist registry keys that track every program a user has manually launched.
+
+Objective: Prove that the "Anonymous" user or an attacker manually opened a specific malicious tool, even if they deleted the shortcut.
+
+22. Hidden Alternate Data Streams (ADS) Hunt
+Command: Get-Item -Path C:\Users\* -Stream * | Where-Object { $_.Stream -ne ':$DATA' }
+
+Description: Scans for "Alternate Data Streams" where files are hidden inside other files.
+
+Objective: This is a classic hacker trick. A small text file might look innocent, but it could have a 5MB malicious .exe hidden inside its metadata stream.
+
+23. PowerShell Script Block Logging Audit
+Command: Get-WinEvent -LogName "Microsoft-Windows-PowerShell/Operational" | Where-Object { $_.Id -eq 4104 } | Select-Object -First 10 Message
+
+Description: Recovers the actual code of scripts that were executed in memory.
+
+Objective: Even if the hacker deleted their .ps1 file, Windows often logs the code blocks here. This is where you find the "intent" of the attack.
+
+24. Prefetch File Analysis (Execution Evidence)
+Command: Get-ChildItem -Path C:\Windows\Prefetch -Filter "*.pf"
+
+Description: Lists Prefetch files which are created by Windows to speed up app loading.
+
+Objective: Each .pf file is proof that a program was executed. If you see MINER.EXE-AD32.pf, you know the system was used for crypto-jacking.
+
+25. BITS (Background Intelligent Transfer Service) Job Audit
+Command: Get-BitsTransfer -AllUsers
+
+Description: Checks for active background download jobs managed by Windows.
+
+Objective: Hackers use BITS to download malware slowly in the background to avoid triggering network spikes that look suspicious.
+
+26. Remote Desktop (RDP) Session Audit
+Command: qwinsta (or query session)
+
+Description: Displays information about all active Remote Desktop sessions.
+
+Objective: To see if a hacker is currently logged into your machine via RDP and watching your screen in real-time.
+
+27. Suspicious Drivers Audit (Rootkit Hunting)
+Command: driverquery /v | Select-String -NotMatch "Microsoft"
+
+Description: Lists all installed hardware drivers not made by Microsoft.
+
+Objective: To find "Rootkits"—malware that hides at the kernel level by pretending to be a driver for a printer or a camera.
+
+28. Environment Variable Hijack Check
+Command: Get-ChildItem Env:
+
+Description: Lists all system environment variables.
+
+Objective: Attackers sometimes change the Path variable so that when you type notepad, it runs their malicious notepad.exe located in a Temp folder instead.
+
+29. Browser Extension Directory Audit
+Command: Get-ChildItem -Path "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Extensions" -Recurse
+
+Description: Scans the physical folders where Chrome/Edge extensions are stored.
+
+Objective: To find "Man-in-the-Browser" extensions that steal banking passwords or redirect your searches.
+
+30. Empty/Null Registry Key Hunt
+Command: Get-ChildItem -Path HKLM:\ -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.SubKeyCount -eq 0 -and $_.ValueCount -eq 0 }
+
+Description: Finds completely empty registry keys.
+
+Objective: Advanced malware creates "Null-terminated" registry keys that many standard security tools cannot scan or delete.
