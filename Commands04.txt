@@ -1,0 +1,70 @@
+🛡️ Expert Forensic & Anti-Rootkit Hunt (Set #04)
+31. Volume Shadow Copy Audit (Ransomware Check)
+Command: vssadmin list shadows
+
+Description: Lists all system restore points and shadow copies.
+
+Objective: Ransomware usually deletes these first. If this list is empty but you didn't delete them, a wiper or ransomware is likely present.
+
+32. SMB Session & Open Files Audit
+Command: Get-SmbSession and Get-SmbOpenFile
+
+Description: Shows who is currently connected to your PC over the network and which files they are touching.
+
+Objective: Identify if an attacker is currently browsing your folders from another device on the network.
+
+33. Hidden Network Interface Check (VPN/Tunneling)
+Command: Get-NetAdapter | Where-Object { $_.Status -eq "Up" }
+
+Description: Lists all active network adapters (Physical and Virtual).
+
+Objective: Detect hidden VPNs or "Virtual Adapters" used by hackers to create an encrypted tunnel (like Tor or Hamachi) to bypass your firewall.
+
+34. System File Checker (SFC) Integrity Log
+Command: sfc /verifyonly
+
+Description: Scans all protected system files to see if they have been modified.
+
+Objective: Unlike sfc /scannow, this only reports changes without fixing them, preserving the evidence of a system file hijack.
+
+35. Windows Management Instrumentation (WMI) Process Tree
+Command: wmic process get ParentProcessId, ProcessId, CommandLine
+
+Description: Maps which process started which.
+
+Objective: Look for "Orphan" processes (e.g., a cmd.exe running with no parent process). This usually indicates a process injection attack.
+
+36. Named Pipe Audit (Inter-Process Communication)
+Command: [System.IO.Directory]::GetFiles("\\.\\pipe\\")
+
+Description: Lists "Named Pipes" used by programs to talk to each other.
+
+Objective: Advanced malware (like Cobalt Strike) uses specific named pipes to move between processes. Look for unusual names like \pipe\msagent_.
+
+37. BIOS/UEFI Firmware Info (Bootkit Hunt)
+Command: Get-WmiObject -Class Win32_BIOS
+
+Description: Pulls the version and serial of your BIOS.
+
+Objective: To verify if your BIOS has been tampered with or if a "Bootkit" has replaced the legitimate firmware info.
+
+38. Global Proxy Settings Audit
+Command: netsh winhttp show proxy
+
+Description: Shows the system-wide proxy settings.
+
+Objective: Attackers set a global proxy to intercept every single piece of data leaving your PC, even if you aren't using a browser.
+
+39. Hidden Directory Search (Rootkit level)
+Command: Get-ChildItem -Path C:\ -Attributes Hidden -Recurse -ErrorAction SilentlyContinue
+
+Description: Forcefully lists every hidden folder on the drive.
+
+Objective: Hackers often name folders ... (three dots) or use non-printable characters to make folders invisible to Windows Explorer.
+
+40. PowerShell History Recovery
+Command: Get-Content (Get-PSReadlineOption).HistorySavePath
+
+Description: Reads the plain-text file where every PowerShell command ever typed is saved.
+
+Objective: This is the ultimate giveaway. If the hacker was lazy, their entire attack history is sitting in this text file.
