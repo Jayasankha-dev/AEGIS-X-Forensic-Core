@@ -1,0 +1,79 @@
+🛡️ Digital Forensic & Incident Response (DFIR) Guide
+Project: System Integrity Audit & Malware Neutralization
+
+Role: Senior Incident Responder (FBI-Standard Protocol)
+
+Environment: Windows PowerShell / Sentinel Shell
+
+📋 Forensic Audit Checklist (The Survival 10)
+This guide provides a manual, zero-trust audit for "dirty" machines where automated antivirus tools might be compromised.
+
+01. Network Isolation & Exfiltration Check
+Command: Get-NetTCPConnection -State Established
+
+Description: Identifies active communication between the local machine and remote IPs.
+
+Objective: Detect unauthorized data transfers (Exfiltration) to Command & Control (C2) servers.
+
+02. Volatile Memory & Process Integrity
+Command: Get-Process | Where-Object { $_.Description -eq $null -or $_.Company -notmatch "Microsoft" }
+
+Description: Filters for processes missing metadata or valid digital signatures.
+
+Objective: Locate "Fileless" malware or unsigned executables running in RAM.
+
+03. Ingress Audit (Backdoor Detection)
+Command: Get-NetTCPConnection -State Listen
+
+Description: Scans for open ports waiting for an external connection.
+
+Objective: Identify unauthorized "Backdoors" opened by an attacker to maintain remote access.
+
+04. Boot Persistence (Registry Audit)
+Command: Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
+
+Description: Checks the primary Registry keys used for auto-starting software.
+
+Objective: Find malware that re-infects the system every time the PC is turned on.
+
+05. Task Scheduler Persistence
+Command: Get-ScheduledTask | Where-Object { $_.Author -notmatch "Microsoft" }
+
+Description: Lists all non-system tasks scheduled to run at specific intervals.
+
+Objective: Detect hidden scripts (like WSHelper or MareBackup) triggered to run in the background.
+
+06. Forensic Timeline Analysis
+Command: Get-ChildItem -Path C:\ -Recurse | Where-Object { $_.CreationTime -gt (Get-Date).AddDays(-1) }
+
+Description: Generates a list of every file created or modified in the last 24 hours.
+
+Objective: Build a chronological "Chain of Evidence" of the breach.
+
+07. Privilege & Account Audit
+Command: Get-LocalGroupMember -Group "Administrators"
+
+Description: Lists every user with full administrative control over the OS.
+
+Objective: Identify "Shadow Admin" accounts (e.g., "Anonymous") created by an attacker.
+
+08. Service Scrubbing
+Command: Get-WmiObject Win32_Service | Where-Object { $_.State -eq "Running" }
+
+Description: Audits active system services running in the background.
+
+Objective: Find malicious agents masquerading as legitimate Windows services.
+
+09. DNS Cache Reconnaissance
+Command: Get-DnsClientCache | Select-Object EntryName, Data
+
+Description: Views the history of all domains and IPs resolved by the system.
+
+Objective: Trace the attacker’s footprint even if browser history has been cleared.
+
+10. Event Log Forensics (The Smoking Gun)
+Command: Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4688} -MaxEvents 50
+
+Description: Extracts security logs for "Process Creation" events.
+
+Objective: Provides an irrefutable log of exactly which commands were executed during the attack.
